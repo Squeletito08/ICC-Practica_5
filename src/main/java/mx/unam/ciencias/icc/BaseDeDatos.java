@@ -22,7 +22,7 @@ public abstract class BaseDeDatos {
      * Constructor único.
      */
     public BaseDeDatos() {
-        // Aquí va su código.
+        registros = new Lista();
     }
 
     /**
@@ -30,7 +30,7 @@ public abstract class BaseDeDatos {
      * @return el número de registros en la base de datos.
      */
     public int getNumRegistros() {
-        // Aquí va su código.
+        return registros.getLongitud();
     }
 
     /**
@@ -39,7 +39,17 @@ public abstract class BaseDeDatos {
      * @return una lista con los registros en la base de datos.
      */
     public Lista getRegistros() {
-        // Aquí va su código.
+
+        Lista lista = new Lista(); 
+
+        Lista.Nodo nodo = registros.getCabeza();
+
+        while(nodo != null){
+            lista.agregaFinal(nodo.get());
+            nodo = nodo.getSiguiente();
+        }
+
+        return lista; 
     }
 
     /**
@@ -47,7 +57,8 @@ public abstract class BaseDeDatos {
      * @param registro el registro que hay que agregar a la base de datos.
      */
     public void agregaRegistro(Registro registro) {
-        // Aquí va su código.
+        registros.agregaFinal(registro);
+        return; 
     }
 
     /**
@@ -55,14 +66,16 @@ public abstract class BaseDeDatos {
      * @param registro el registro que hay que eliminar de la base de datos.
      */
     public void eliminaRegistro(Registro registro) {
-        // Aquí va su código.
+        registros.elimina(registro);
+        return; 
     }
 
     /**
      * Limpia la base de datos.
      */
     public void limpia() {
-        // Aquí va su código.
+        registros.limpia();
+        return;
     }
 
     /**
@@ -71,7 +84,15 @@ public abstract class BaseDeDatos {
      * @throws IOException si ocurre un error de entrada/salida.
      */
     public void guarda(BufferedWriter out) throws IOException {
-        // Aquí va su código.
+
+        Lista.Nodo nodo = registros.getCabeza(); 
+
+        while(nodo != null){
+            Estudiante estudiante = (Estudiante)nodo.get();
+            out.write(estudiante.seria());    
+            nodo = nodo.getSiguiente();
+        }
+        return;
     }
 
     /**
@@ -82,7 +103,28 @@ public abstract class BaseDeDatos {
      * @throws IOException si ocurre un error de entrada/salida.
      */
     public void carga(BufferedReader in) throws IOException {
-        // Aquí va su código.
+
+        registros.limpia(); 
+
+        String linea = in.readLine();
+        BaseDeDatosEstudiantes bdd = new BaseDeDatosEstudiantes(); 
+
+        while( linea != null ){
+
+            if(linea.trim().equals(""))
+                return; 
+
+            Estudiante e = (Estudiante)bdd.creaRegistro(); 
+            try{
+                e.deseria(linea);
+                agregaRegistro(e);
+            }
+            catch(ExcepcionLineaInvalida excepcion){
+                throw new IOException();
+            }
+            linea = in.readLine();
+        }
+        return; 
     }
 
     /**
@@ -94,8 +136,27 @@ public abstract class BaseDeDatos {
      * @throws IllegalArgumentException si el campo no es de la enumeración
      *         correcta.
      */
-    public Lista buscaRegistros(Enum campo, Object valor) {
-        // Aquí va su código.
+    public Lista buscaRegistros(Enum campo, Object valor){
+        
+        if(!(campo instanceof CampoEstudiante))
+            throw new IllegalArgumentException();
+
+        Lista lista = new Lista(); 
+
+        Lista.Nodo nodo = registros.getCabeza(); 
+
+        Estudiante e; 
+
+        while(nodo != null){
+
+            e = (Estudiante)nodo.get();
+            if(e.casa(campo,valor)){
+                lista.agregaFinal(nodo.get());
+            }
+            nodo = nodo.getSiguiente();
+        }
+        
+        return lista; 
     }
 
     /**
