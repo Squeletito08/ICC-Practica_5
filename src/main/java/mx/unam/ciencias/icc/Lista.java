@@ -295,7 +295,6 @@ public class Lista {
      *         <code>false</code> en otro caso.
      */
     public boolean contiene(Object elemento) {
-
         return buscaNodo(elemento) != null;
     }
 
